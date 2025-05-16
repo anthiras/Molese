@@ -5,9 +5,9 @@ namespace Application.Commands;
 
 public class AircraftCommandHandler
 {
-    private readonly IRepository<Aircraft, Id<Aircraft>> _repository;
+    private readonly IRepository<Aircraft> _repository;
 
-    public AircraftCommandHandler(IRepository<Aircraft, Id<Aircraft>> repository)
+    public AircraftCommandHandler(IRepository<Aircraft> repository)
     {
         _repository = repository;
     }

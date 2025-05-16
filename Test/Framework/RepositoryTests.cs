@@ -8,7 +8,7 @@ namespace Test.Framework;
 
 public abstract class RepositoryTests
 {
-    protected IRepository<Aircraft, Id<Aircraft>> Sut = null!;
+    protected IRepository<Aircraft> Sut = null!;
 
     [Theory, DomainAutoData]
     public async Task StoreAndFindEntity(Aircraft aircraft)
@@ -24,7 +24,7 @@ public class InMemoryRepositoryTests : RepositoryTests
 {
     public InMemoryRepositoryTests()
     {
-        Sut = new InMemoryRepository<Aircraft, Id<Aircraft>>();
+        Sut = new InMemoryRepository<Aircraft>();
     }
 }
 

@@ -9,7 +9,7 @@ namespace Test.Application.Commands;
 public class AircraftCommandTests
 {
     private readonly AircraftCommandHandler _sut;
-    private readonly InMemoryRepository<Aircraft, Id<Aircraft>> _repository = new();
+    private readonly InMemoryRepository<Aircraft> _repository = new();
 
     public AircraftCommandTests()
     {

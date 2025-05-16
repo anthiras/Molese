@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     private static IServiceCollection AddEventSourcedAggregate<T>(this IServiceCollection services,
         Func<Id<T>, IEnumerable<Event<T>>, T> factory) where T : AggregateRoot<T>
     {
-        return services.AddSingleton<IRepository<T, Id<T>>>(sp =>
+        return services.AddSingleton<IRepository<T>>(sp =>
             ActivatorUtilities.CreateInstance<EventSourcedRepository<T>>(sp, factory));
     }
 }

@@ -11,11 +11,11 @@ using Test.Domain;
 using Test.Kurrent;
 using Test.TestUtils;
 
-namespace Test.Application;
+namespace Test.Application.Projections;
 
 public abstract class ProjectionTests
 {
-    private readonly IRepository<Aircraft, Id<Aircraft>> _repository;
+    private readonly IRepository<Aircraft> _repository;
     private readonly IDocumentStore _documentStore;
     private readonly ProjectionSubscriber _subscriber;
     private readonly TrackedEventStore _trackedEventStore;
@@ -29,7 +29,7 @@ public abstract class ProjectionTests
         services.Decorate<IEventStore, TrackedEventStore>();
         
         var serviceProvider = services.BuildServiceProvider();
-        _repository = serviceProvider.GetRequiredService<IRepository<Aircraft, Id<Aircraft>>>();
+        _repository = serviceProvider.GetRequiredService<IRepository<Aircraft>>();
         _documentStore = serviceProvider.GetRequiredService<IDocumentStore>();
         _subscriber = serviceProvider.GetRequiredService<ProjectionSubscriber>();
         _trackedEventStore = (TrackedEventStore) serviceProvider.GetRequiredService<IEventStore>();

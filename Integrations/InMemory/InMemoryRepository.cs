@@ -2,11 +2,11 @@ using Framework;
 
 namespace InMemory;
 
-public class InMemoryRepository<TEntity, TId> : IRepository<TEntity, TId> where TEntity : IIdentifiable<TId> where TId : notnull
+public class InMemoryRepository<TEntity> : IRepository<TEntity> where TEntity : IIdentifiable<Id<TEntity>>
 {
-    private readonly Dictionary<TId, TEntity> _entities = new();
+    private readonly Dictionary<Id<TEntity>, TEntity> _entities = new();
     
-    public Task<TEntity> Find(TId id, CancellationToken ct = default)
+    public Task<TEntity> Find(Id<TEntity> id, CancellationToken ct = default)
     {
         return Task.FromResult(_entities[id]);
     }

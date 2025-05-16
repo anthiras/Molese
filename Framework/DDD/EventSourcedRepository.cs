@@ -1,7 +1,7 @@
 namespace Framework;
 
 public class EventSourcedRepository<T>(IEventStore eventStore, Func<Id<T>, IEnumerable<Event<T>>, T> factory) 
-    : IRepository<T, Id<T>> where T : AggregateRoot<T>
+    : IRepository<T> where T : AggregateRoot<T>
 {
     public async Task<T> Find(Id<T> id, CancellationToken ct = default)
     {
