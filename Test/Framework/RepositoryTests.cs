@@ -56,4 +56,14 @@ public class EventSourcedRepositoryTests : RepositoryTests
         
         Assert.Empty(aircraft.UncommittedEvents);
     }
+    
+    [Theory, DomainAutoData]
+    public async Task FailsForDuplicates(Id<Aircraft> id, AircraftRegistration registration)
+    {
+        var aircraft1 = new Aircraft(id, registration);
+        var aircraft2 = new Aircraft(id, registration);
+        
+        await Sut.Store(aircraft1);
+        await Assert.ThrowsAnyAsync<Exception>(() => Sut.Store(aircraft2));
+    }
 }

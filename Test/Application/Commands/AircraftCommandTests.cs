@@ -2,6 +2,7 @@ using Application.Commands;
 using Domain.Aircrafts;
 using Framework;
 using InMemory;
+using NSubstitute;
 using Test.Domain;
 
 namespace Test.Application.Commands;
@@ -9,7 +10,7 @@ namespace Test.Application.Commands;
 public class AircraftCommandTests
 {
     private readonly AircraftCommandHandler _sut;
-    private readonly InMemoryRepository<Aircraft> _repository = new();
+    private readonly IRepository<Aircraft> _repository = Substitute.For<IRepository<Aircraft>>();
 
     public AircraftCommandTests()
     {
@@ -19,10 +20,8 @@ public class AircraftCommandTests
     [Theory, DomainAutoData]
     public async Task CreateCommandStoresNewAircraftInRepo(CreateAircraft command)
     {
-        var id = await _sut.Handle(command);
+        await _sut.Handle(command);
 
-        var aircraft = await _repository.Find(id);
-        
-        Assert.Equal(command.Registration, aircraft.Registration);
+        await _repository.Received().Store(Arg.Is<Aircraft>(a => command.Registration.Equals(a.Registration)));
     }
 }

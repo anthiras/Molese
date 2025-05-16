@@ -16,4 +16,10 @@ public class InMemoryRepository<TEntity> : IRepository<TEntity> where TEntity : 
         _entities[entity.Id] = entity;
         return Task.CompletedTask;
     }
+
+    public Task Delete(Id<TEntity> id, CancellationToken ct = default)
+    {
+        _entities.Remove(id);
+        return Task.CompletedTask;
+    }
 }

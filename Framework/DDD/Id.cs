@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -5,11 +6,19 @@ using System.Text.Json.Serialization;
 namespace Framework;
 
 [JsonConverter(typeof(IdJsonConverterFactory))]
-public readonly record struct Id<T>(string Value)
+public readonly record struct Id<T>(string Value) : IParsable<Id<T>>
 {
     public static Id<T> New() => new(Guid.NewGuid().ToString());
 
     public override string ToString() => Value;
+    
+    public static Id<T> Parse(string s, IFormatProvider? provider) => new(s);
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Id<T> result)
+    {
+        result = s != null ? new Id<T>(s) : default;
+        return s != null;
+    }
 }
 
 public class IdJsonConverterFactory : JsonConverterFactory

@@ -13,10 +13,12 @@ public class EventSourcedRepository<T>(IEventStore eventStore, Func<Id<T>, IEnum
     public async Task Store(T entity, CancellationToken ct = default)
     {
         await eventStore.AppendToStream(new StreamId(entity.Id.Value), entity.UncommittedEvents, entity.Version, ct);
-
-        // foreach (var e in entity.UncommittedEvents)
-        //     await eventPublisher.Publish(e, ct);
         
         entity.ClearEvents();
+    }
+
+    public Task Delete(Id<T> id, CancellationToken ct = default)
+    {
+        return eventStore.DeleteStream(new StreamId(id.Value), ct);
     }
 }

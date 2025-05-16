@@ -9,7 +9,8 @@ namespace Test.TestUtils;
 public class TrackedEventStore(IEventStore eventStore) : IEventStore
 {
     private int _eventsReceived;
-    
+
+
     public Task Subscribe(Func<Event, CancellationToken, Task> callback, CancellationToken ct = default)
     {
         return eventStore.Subscribe(async (@event, token) =>
@@ -32,4 +33,7 @@ public class TrackedEventStore(IEventStore eventStore) : IEventStore
     public Task AppendToStream(StreamId streamId, IEnumerable<Event> events, int expectedVersion,
         CancellationToken ct = default) =>
         eventStore.AppendToStream(streamId, events, expectedVersion, ct);
+
+    public Task DeleteStream(StreamId streamId, CancellationToken ct = default) =>
+        eventStore.DeleteStream(streamId, ct);
 }

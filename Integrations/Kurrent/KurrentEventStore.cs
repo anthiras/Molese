@@ -28,7 +28,12 @@ public class KurrentEventStore(EventStoreClient client) : IEventStore
             throw new DBConcurrencyException(e.Message, e);
         }
     }
-    
+
+    public async Task DeleteStream(StreamId streamId, CancellationToken ct = default)
+    {
+        await client.DeleteAsync(streamId.ToString(), StreamState.Any, cancellationToken: ct);
+    }
+
     public async Task Subscribe(Func<Event, CancellationToken, Task> callback, CancellationToken ct = default)
     {
         await client.SubscribeToAllAsync(FromAll.End, (_, e, token) =>

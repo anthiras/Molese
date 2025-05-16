@@ -8,20 +8,6 @@ public class InMemoryEventStore : IEventStore
     private readonly Dictionary<StreamId, List<Event>> _eventStreams = new();
     private readonly List<Func<Event, CancellationToken, Task>> _subscriptions = [];
     
-    public async Task Publish(Event @event, CancellationToken ct = default)
-    {
-        foreach (var callback in _subscriptions)
-        {
-            await callback(@event, ct);
-        }
-    }
-
-    public Task Subscribe(Func<Event, CancellationToken, Task> callback, CancellationToken ct = default)
-    {
-        _subscriptions.Add(callback);
-        return Task.CompletedTask;
-    }
-    
     public Task<IEnumerable<Event>> LoadStream(StreamId streamId, CancellationToken ct = default)
     {
         return Task.FromResult(_eventStreams[streamId].AsEnumerable());
@@ -41,5 +27,25 @@ public class InMemoryEventStore : IEventStore
                 await Publish(@event, ct);
             }
         }, ct);
+    }
+    
+    public Task DeleteStream(StreamId streamId, CancellationToken ct = default)
+    {
+        _eventStreams.Remove(streamId);
+        return Task.CompletedTask;
+    }
+
+    public async Task Publish(Event @event, CancellationToken ct = default)
+    {
+        foreach (var callback in _subscriptions)
+        {
+            await callback(@event, ct);
+        }
+    }
+
+    public Task Subscribe(Func<Event, CancellationToken, Task> callback, CancellationToken ct = default)
+    {
+        _subscriptions.Add(callback);
+        return Task.CompletedTask;
     }
 }

@@ -3,21 +3,19 @@ using Framework;
 
 namespace Application.Commands;
 
-public class AircraftCommandHandler
+public class AircraftCommandHandler(IRepository<Aircraft> repository) : 
+    ICommandHandler<CreateAircraft>,
+    ICommandHandler<DeleteAircraft>
 {
-    private readonly IRepository<Aircraft> _repository;
-
-    public AircraftCommandHandler(IRepository<Aircraft> repository)
-    {
-        _repository = repository;
-    }
-
-    public async Task<Id<Aircraft>> Handle(CreateAircraft command)
+    public async Task Handle(CreateAircraft command)
     {
         var aircraft = new Aircraft(Id<Aircraft>.New(), command.Registration);
 
-        await _repository.Store(aircraft);
+        await repository.Store(aircraft);
+    }
 
-        return aircraft.Id;
+    public Task Handle(DeleteAircraft command)
+    {
+        return repository.Delete(command.Id);
     }
 }

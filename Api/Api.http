@@ -1,0 +1,11 @@
+@Api_HostAddress = https://localhost:7226
+
+POST {{Api_HostAddress}}/aircrafts/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "registration": "AB1234"
+}
+
+###
