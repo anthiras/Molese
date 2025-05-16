@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Application.Commands;
 using Application.Projections;
+using Application.Queries;
 using Domain.Aircrafts;
 using Framework;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddQueries(this IServiceCollection services)
     {
-        return services;
+        return services.AddSingleton<IQueryHandler<GetAllAircrafts, IAsyncEnumerable<AircraftListItem>>, AircraftQueryHandler>()
+            .AddSingleton<IQueryHandler<GetAircraftById, Task<AircraftListItem>>, AircraftQueryHandler>();
     }
 }

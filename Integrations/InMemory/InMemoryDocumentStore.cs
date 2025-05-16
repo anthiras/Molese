@@ -16,4 +16,15 @@ public class InMemoryDocumentStore : IDocumentStore
         _documents[document.Id.ToString()] = document;
         return Task.CompletedTask;
     }
+
+    public Task Delete<TId>(Id<TId> id, CancellationToken ct = default)
+    {
+        _documents.Remove(id.ToString());
+        return Task.CompletedTask;
+    }
+
+    public IAsyncEnumerable<TDocument> FindAll<TDocument>(CancellationToken ct = default)
+    {
+        return _documents.Values.Cast<TDocument>().ToAsyncEnumerable();
+    }
 }

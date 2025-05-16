@@ -1,4 +1,6 @@
 using Application.Commands;
+using Application.Projections;
+using Application.Queries;
 using Domain.Aircrafts;
 using Framework;
 
@@ -21,6 +23,18 @@ public static class AircraftRoutes
             return Results.NoContent();
         }).WithSummary("Delete an aircraft")
         .WithTags("Aircrafts");
+
+        app.MapGet("/aircrafts",
+                (IQueryHandler<GetAllAircrafts, IAsyncEnumerable<AircraftListItem>> queryHandler) =>
+                    queryHandler.Query(new GetAllAircrafts()))
+            .WithSummary("Get all aircrafts")
+            .WithTags("Aircrafts");
+
+        app.MapGet("/aircrafts/{id}",
+                (Id<Aircraft> id, IQueryHandler<GetAircraftById, Task<AircraftListItem>> queryHandler) =>
+                    queryHandler.Query(new GetAircraftById(id)))
+            .WithSummary("Get aircraft by ID")
+            .WithTags("Aircrafts");
 
         return app;
     }

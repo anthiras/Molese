@@ -1,5 +1,6 @@
 using Api.Aircrafts;
 using Application;
+using Application.Projections;
 using Domain;
 using InMemory;
 using Scalar.AspNetCore;
@@ -27,4 +28,5 @@ app.UseHttpsRedirection();
 
 app.MapAircraftRoutes();
 
+await app.Services.GetRequiredService<ProjectionSubscriber>().Subscribe();
 app.Run();

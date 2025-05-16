@@ -4,7 +4,10 @@ using System.Text.Json.Serialization;
 namespace Domain.Aircrafts;
 
 [JsonConverter(typeof(AircraftRegistrationJsonConverter))]
-public readonly struct AircraftRegistration(string value);
+public readonly struct AircraftRegistration(string value)
+{
+    public string Value { get; } = value;
+}
 
 internal class AircraftRegistrationJsonConverter : JsonConverter<AircraftRegistration>
 {
@@ -12,5 +15,5 @@ internal class AircraftRegistrationJsonConverter : JsonConverter<AircraftRegistr
         JsonSerializerOptions options) => new AircraftRegistration(reader.GetString()!);
 
     public override void Write(Utf8JsonWriter writer, AircraftRegistration value, JsonSerializerOptions options) =>
-        writer.WriteStringValue(value.ToString());
+        writer.WriteStringValue(value.Value);
 }
