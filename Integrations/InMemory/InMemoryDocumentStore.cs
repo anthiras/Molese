@@ -17,7 +17,7 @@ public class InMemoryDocumentStore : IDocumentStore
         return Task.CompletedTask;
     }
 
-    public Task Delete<TId>(Id<TId> id, CancellationToken ct = default)
+    public Task Delete<TDocument, TId>(Id<TId> id, CancellationToken ct = default) where TDocument : IIdentifiable<Id<TId>>
     {
         _documents.Remove(id.ToString());
         return Task.CompletedTask;

@@ -7,6 +7,8 @@ using Framework;
 using InMemory;
 using Kurrent;
 using Microsoft.Extensions.DependencyInjection;
+using Mongo;
+using MongoDB.Driver;
 using Test.Domain;
 using Test.Kurrent;
 using Test.TestUtils;
@@ -62,7 +64,6 @@ public abstract class ProjectionTests
 
 public class InMemoryProjectionTests() : ProjectionTests(services => services
     .AddInMemoryEventStore()
-    //.AddInMemoryPubSub()
     .AddInMemoryDocumentStore()
 );
 
@@ -70,6 +71,10 @@ public class KurrentProjectionTests(KurrentContainerFixture fixture) : Projectio
 {
     var settings = EventStoreClientSettings.Create(fixture.Container.GetConnectionString());
     services.AddKurrentEventStore(settings);
-    //services.AddKurrentPubSub(settings);
     services.AddInMemoryDocumentStore();
 }), IClassFixture<KurrentContainerFixture>;
+
+public class MongoDbProjectionTests(MongoDbContainerFixture fixture) : ProjectionTests(services =>
+    services.AddMongoDbDocumentStore(MongoClientSettings.FromConnectionString(fixture.Container.GetConnectionString()))
+        .AddInMemoryEventStore()
+    ), IClassFixture<MongoDbContainerFixture>;

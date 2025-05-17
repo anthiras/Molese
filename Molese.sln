@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kurrent", "Integrations\Kur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{466E9D01-9303-406E-950E-B9EF6C8D4E0A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongo", "Integrations\Mongo\Mongo.csproj", "{FFC31C83-033B-4C05-AF9B-B50B410AA48C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,9 +58,14 @@ Global
 		{466E9D01-9303-406E-950E-B9EF6C8D4E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{466E9D01-9303-406E-950E-B9EF6C8D4E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{466E9D01-9303-406E-950E-B9EF6C8D4E0A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFC31C83-033B-4C05-AF9B-B50B410AA48C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFC31C83-033B-4C05-AF9B-B50B410AA48C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFC31C83-033B-4C05-AF9B-B50B410AA48C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFC31C83-033B-4C05-AF9B-B50B410AA48C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BF6AD879-D1CE-4326-BD71-888E78BD72F6} = {13EC47C8-ABE7-4EA4-9B07-5BAE4F96FD79}
 		{A702755F-2A27-46FE-BC03-D49FF6E95C9A} = {13EC47C8-ABE7-4EA4-9B07-5BAE4F96FD79}
+		{FFC31C83-033B-4C05-AF9B-B50B410AA48C} = {13EC47C8-ABE7-4EA4-9B07-5BAE4F96FD79}
 	EndGlobalSection
 EndGlobal
