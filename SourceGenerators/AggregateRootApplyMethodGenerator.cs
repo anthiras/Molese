@@ -58,6 +58,8 @@ public class AggregateRootApplyMethodGenerator : IIncrementalGenerator
         
         return 
             $$"""
+              using Framework;
+              
               namespace {{classSymbol.ContainingNamespace}};
 
               public partial class {{classSymbol.Name}}

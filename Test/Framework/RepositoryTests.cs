@@ -1,22 +1,21 @@
-using Domain.Aircrafts;
+using AutoFixture.Xunit2;
 using Framework;
 using InMemory;
-using Test.Domain;
 using Test.TestUtils;
 
 namespace Test.Framework;
 
 public abstract class RepositoryTests
 {
-    protected IRepository<Aircraft> Sut = null!;
+    protected IRepository<TestAggregate> Sut = null!;
 
-    [Theory, DomainAutoData]
-    public async Task StoreAndFindEntity(Aircraft aircraft)
+    [Theory, AutoData]
+    public async Task StoreAndFindEntity(TestAggregate aggregate)
     {
-        await Sut.Store(aircraft);
-        var reloaded = await Sut.Find(aircraft.Id);
+        await Sut.Store(aggregate);
+        var reloaded = await Sut.Find(aggregate.Id);
         
-        Assert.Equal(aircraft.Id, reloaded.Id);
+        Assert.Equal(aggregate.Id, reloaded.Id);
     }
 }
 
@@ -24,7 +23,7 @@ public class InMemoryRepositoryTests : RepositoryTests
 {
     public InMemoryRepositoryTests()
     {
-        Sut = new InMemoryRepository<Aircraft>();
+        Sut = new InMemoryRepository<TestAggregate>();
     }
 }
 
@@ -34,36 +33,36 @@ public class EventSourcedRepositoryTests : RepositoryTests
     
     public EventSourcedRepositoryTests()
     {
-        Sut = new EventSourcedRepository<Aircraft>(_eventStore, (id, events) => new Aircraft(id, events));
+        Sut = new EventSourcedRepository<TestAggregate>(_eventStore, (id, events) => new TestAggregate(id, events));
     }
     
-    [Theory, DomainAutoData]
-    public async Task StoringEntityPublishesUncommittedEvents(Aircraft aircraft)
+    [Theory, AutoData]
+    public async Task StoringEntityPublishesUncommittedEvents(TestAggregate aggregate)
     {
-        var uncommittedEvents = aircraft.UncommittedEvents.ToList();
+        var uncommittedEvents = aggregate.UncommittedEvents.ToList();
 
         var publishedEvents = await _eventStore.CaptureEvents();
         
-        await Sut.Store(aircraft);
+        await Sut.Store(aggregate);
         
         Assert.Equal(publishedEvents, uncommittedEvents);
     }
 
-    [Theory, DomainAutoData]
-    public async Task NoEventsAreUncommittedAfterStoringEntity(Aircraft aircraft)
+    [Theory, AutoData]
+    public async Task NoEventsAreUncommittedAfterStoringEntity(TestAggregate aggregate)
     {
-        await Sut.Store(aircraft);
+        await Sut.Store(aggregate);
         
-        Assert.Empty(aircraft.UncommittedEvents);
+        Assert.Empty(aggregate.UncommittedEvents);
     }
     
-    [Theory, DomainAutoData]
-    public async Task FailsForDuplicates(Id<Aircraft> id, AircraftRegistration registration)
+    [Theory, AutoData]
+    public async Task FailsForDuplicates(Id<TestAggregate> id)
     {
-        var aircraft1 = new Aircraft(id, registration);
-        var aircraft2 = new Aircraft(id, registration);
+        var aggregate1 = new TestAggregate(id);
+        var aggregate2 = new TestAggregate(id);
         
-        await Sut.Store(aircraft1);
-        await Assert.ThrowsAnyAsync<Exception>(() => Sut.Store(aircraft2));
+        await Sut.Store(aggregate1);
+        await Assert.ThrowsAnyAsync<Exception>(() => Sut.Store(aggregate2));
     }
 }
