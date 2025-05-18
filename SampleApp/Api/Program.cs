@@ -1,6 +1,6 @@
+using Framework;
 using SampleApp.Api.Aircrafts;
 using SampleApp.Application;
-using SampleApp.Application.Projections;
 using SampleApp.Domain;
 using InMemory;
 using Scalar.AspNetCore;
@@ -13,7 +13,8 @@ builder.Services.AddOpenApi()
     .AddDomain()
     .AddApplication()
     .AddInMemoryEventStore() // Replace with your favorite event store
-    .AddInMemoryDocumentStore(); // Replace with your favorite document store
+    .AddInMemoryDocumentStore() // Replace with your favorite document store
+    .AddSingleton<EventSubscriber>();
 
 var app = builder.Build();
 
@@ -28,5 +29,5 @@ app.UseHttpsRedirection();
 
 app.MapAircraftRoutes();
 
-await app.Services.GetRequiredService<ProjectionSubscriber>().Subscribe();
+await app.Services.GetRequiredService<EventSubscriber>().Subscribe();
 app.Run();

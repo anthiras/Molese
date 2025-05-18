@@ -9,6 +9,8 @@ using SampleApp.Application;
 using SampleApp.Application.Projections;
 using SampleApp.Domain;
 using SampleApp.Domain.Aircrafts;
+using SampleApp.Domain.Flights;
+using SampleApp.Domain.Time;
 using SampleApp.Test.Domain;
 using Test.Kurrent;
 using Test.TestUtils;
@@ -17,47 +19,43 @@ namespace SampleApp.Test.Application.Projections;
 
 public abstract class ProjectionTests
 {
-    private readonly IRepository<Aircraft> _repository;
     private readonly IDocumentStore _documentStore;
-    private readonly ProjectionSubscriber _subscriber;
+    private readonly EventSubscriber _subscriber;
     private readonly TrackedEventStore _trackedEventStore;
     
     protected ProjectionTests(Action<IServiceCollection> configureServices)
     {
         var services = new ServiceCollection()
             .AddDomain()
-            .AddApplication();
+            .AddApplication()
+            .AddSingleton<EventSubscriber>();
         configureServices(services);
         services.Decorate<IEventStore, TrackedEventStore>();
         
         var serviceProvider = services.BuildServiceProvider();
-        _repository = serviceProvider.GetRequiredService<IRepository<Aircraft>>();
         _documentStore = serviceProvider.GetRequiredService<IDocumentStore>();
-        _subscriber = serviceProvider.GetRequiredService<ProjectionSubscriber>();
+        _subscriber = serviceProvider.GetRequiredService<EventSubscriber>();
         _trackedEventStore = (TrackedEventStore) serviceProvider.GetRequiredService<IEventStore>();
     }
 
     [Theory, DomainAutoData]
-    public async Task AircraftChangesAreProjectedToAircraftView(Id<Aircraft> id, AircraftRegistration registration, Assignment assignment)
+    public async Task AircraftEventsAreProjectedToAircraftView(Id<Aircraft> id, AircraftRegistration registration, Id<Flight> flightId, TimeRange timeRange)
     {
         await _subscriber.Subscribe();
         
-        var aircraft = new Aircraft(id, registration);
-        await _repository.Store(aircraft);
+        await _trackedEventStore.AppendToStream(new StreamId(id.Value), [new AircraftCreated(id, registration)], 0);
 
         await _trackedEventStore.WaitForEvents(1);
         
-        var listItem = await _documentStore.Find<AircraftListItem, Aircraft>(aircraft.Id);
+        var listItem = await _documentStore.Find<AircraftListItem, Aircraft>(id);
         Assert.Equal(registration.ToString(), listItem.Registration);
         Assert.Equal(0, listItem.Flights);
 
-        aircraft = await _repository.Find(id);
-        aircraft.Assign(assignment);
-        await _repository.Store(aircraft);
+        await _trackedEventStore.AppendToStream(new StreamId(id.Value), [new AircraftAssignedToFlight(id, flightId, timeRange)], 1);
         
         await _trackedEventStore.WaitForEvents(2);
         
-        listItem = await _documentStore.Find<AircraftListItem, Aircraft>(aircraft.Id);
+        listItem = await _documentStore.Find<AircraftListItem, Aircraft>(id);
         Assert.Equal(1, listItem.Flights);
     }
 }

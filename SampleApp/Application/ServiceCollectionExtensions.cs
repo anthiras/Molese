@@ -19,8 +19,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddProjections(this IServiceCollection services)
     {
-        return services.AddSingleton<ProjectionSubscriber>()
-            .AddSingleton<IEventHandler, AircraftListView>();
+        return services.AddSingleton<IEventHandler, AircraftListView>();
     }
 
     private static IServiceCollection AddCommands(this IServiceCollection services)

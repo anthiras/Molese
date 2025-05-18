@@ -1,8 +1,6 @@
-using Framework;
+namespace Framework;
 
-namespace SampleApp.Application.Projections;
-
-public class ProjectionSubscriber(IEventStore eventStore, IEnumerable<IEventHandler> eventHandlers)
+public class EventSubscriber(IEventStore eventStore, IEnumerable<IEventHandler> eventHandlers)
 {
     public async Task Subscribe(CancellationToken ct = default)
     {
