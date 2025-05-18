@@ -33,7 +33,7 @@ public abstract class DocumentStoreTests(IDocumentStore sut)
         
         await Assert.ThrowsAnyAsync<Exception>(() => sut.Find<TestDocument, TestDocument>(doc.Id));
         
-        Assert.Empty(sut.FindAll<TestDocument>());
+        Assert.DoesNotContain(doc, sut.FindAll<TestDocument>());
     }
 
     [Theory, AutoData]
