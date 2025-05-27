@@ -20,16 +20,44 @@ public static class ServiceCollectionExtensions
             .AsImplementedInterfaces()
             .WithSingletonLifetime());
     }
-    
-    public static IServiceCollection RegisterAggregateRootRepository<T>(this IServiceCollection services,
-        Func<Id<T>, IEnumerable<Event<T>>, T> factory) where T : AggregateRoot<T>
+
+    public static IServiceCollection RegisterEventSourcedRepositories(this IServiceCollection services,
+        params Assembly[] assemblies)
     {
-        return services.AddSingleton<IRepository<T>>(sp =>
-            ActivatorUtilities.CreateInstance<EventSourcedRepository<T>>(sp, factory));
+        var aggregateRoots = assemblies.SelectMany(assembly => assembly.GetTypes().Where(IsAggregateRoot));
+
+        foreach (var aggregateRoot in aggregateRoots)
+        {
+            services.AddSingleton(
+                typeof(IRepository<>).MakeGenericType(aggregateRoot),
+                typeof(EventSourcedRepository<>).MakeGenericType(aggregateRoot));
+        }
+
+        return services;
+    }
+    
+    public static IServiceCollection RegisterDocumentRepositories(this IServiceCollection services,
+        params Assembly[] assemblies)
+    {
+        var documents = assemblies.SelectMany(assembly => assembly.GetTypes().Where(IsDocument));
+
+        foreach (var document in documents)
+        {
+            services.AddSingleton(
+                typeof(IRepository<>).MakeGenericType(document),
+                typeof(DocumentRepository<>).MakeGenericType(document));
+        }
+
+        return services;
     }
 
-    public static IServiceCollection RegisterDocumentRepository<T>(this IServiceCollection services) where T : Document<T>
+    private static bool IsAggregateRoot(Type type)
     {
-        return services.AddSingleton<IRepository<T>, DocumentRepository<T>>();
+        return type.BaseType is { IsGenericType: true } && type.BaseType.GetGenericTypeDefinition() == typeof(AggregateRoot<>);
+    }
+    
+    private static bool IsDocument(Type type)
+    {
+        return type.BaseType is { IsGenericType: true } && type.BaseType.GetGenericTypeDefinition() == typeof(Document<>);
     }
 }

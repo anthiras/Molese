@@ -27,8 +27,8 @@ public abstract class ProjectionTests
     {
         var services = new ServiceCollection()
             .RegisterHandlersFromAssemblies(typeof(Aircraft).Assembly, typeof(AircraftListItem).Assembly)
-            .RegisterAggregateRootRepository<Aircraft>(Aircraft.Create)
-            .RegisterDocumentRepository<AircraftListItem>()
+            .RegisterEventSourcedRepositories(typeof(Aircraft).Assembly)
+            .RegisterDocumentRepositories(typeof(AircraftListItem).Assembly)
             .AddEventSubscriber();
         configureServices(services);
         services.Decorate<IEventStore, TrackedEventStore>();

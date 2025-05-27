@@ -1,13 +1,14 @@
 namespace Framework;
 
-public class EventSourcedRepository<T>(IEventStore eventStore, Func<Id<T>, IEnumerable<Event<T>>, T> factory) 
+public class EventSourcedRepository<T>(IEventStore eventStore) 
     : IRepository<T> where T : AggregateRoot<T>
 {
     public async Task<T> Find(Id<T> id, CancellationToken ct = default)
     {
         var stream = await eventStore.LoadStream(id, ct);
-        
-        return factory(id, stream.Cast<Event<T>>());
+
+        return (T?) Activator.CreateInstance(typeof(T), id, stream.Cast<Event<T>>())
+            ?? throw new Exception($"Failed to instantiate type {typeof(T).Name}");
     }
 
     public async Task Store(T entity, CancellationToken ct = default)

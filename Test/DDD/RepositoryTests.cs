@@ -23,7 +23,7 @@ public class InMemoryRepositoryTests()
     : RepositoryTests(new InMemoryRepository<TestAggregate>());
 
 public class EventSourcedRepositoryTests() 
-    : RepositoryTests(new EventSourcedRepository<TestAggregate>(EventStore, (id, events) => new TestAggregate(id, events)))
+    : RepositoryTests(new EventSourcedRepository<TestAggregate>(EventStore))
 {
     private static readonly InMemoryEventStore EventStore = new();
     
