@@ -3,12 +3,12 @@ using Framework;
 using InMemory;
 using Test.TestUtils;
 
-namespace Test.Framework;
+namespace Test.DDD;
 
-public abstract class RepositoryTests
+public abstract class RepositoryTests(IRepository<TestAggregate> sut)
 {
-    protected IRepository<TestAggregate> Sut = null!;
-
+    protected readonly IRepository<TestAggregate> Sut = sut;
+    
     [Theory, AutoData]
     public async Task StoreAndFindEntity(TestAggregate aggregate)
     {
@@ -19,29 +19,20 @@ public abstract class RepositoryTests
     }
 }
 
-public class InMemoryRepositoryTests : RepositoryTests
-{
-    public InMemoryRepositoryTests()
-    {
-        Sut = new InMemoryRepository<TestAggregate>();
-    }
-}
+public class InMemoryRepositoryTests() 
+    : RepositoryTests(new InMemoryRepository<TestAggregate>());
 
-public class EventSourcedRepositoryTests : RepositoryTests
+public class EventSourcedRepositoryTests() 
+    : RepositoryTests(new EventSourcedRepository<TestAggregate>(EventStore, (id, events) => new TestAggregate(id, events)))
 {
-    private readonly InMemoryEventStore _eventStore = new();
-    
-    public EventSourcedRepositoryTests()
-    {
-        Sut = new EventSourcedRepository<TestAggregate>(_eventStore, (id, events) => new TestAggregate(id, events));
-    }
+    private static readonly InMemoryEventStore EventStore = new();
     
     [Theory, AutoData]
     public async Task StoringEntityPublishesUncommittedEvents(TestAggregate aggregate)
     {
         var uncommittedEvents = aggregate.UncommittedEvents.ToList();
 
-        var publishedEvents = await _eventStore.CaptureEvents();
+        var publishedEvents = await EventStore.CaptureEvents();
         
         await Sut.Store(aggregate);
         

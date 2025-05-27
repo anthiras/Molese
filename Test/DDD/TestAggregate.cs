@@ -1,6 +1,6 @@
 using Framework;
 
-namespace Test.Framework;
+namespace Test.DDD;
 
 public partial class TestAggregate : AggregateRoot<TestAggregate>
 {

@@ -13,7 +13,7 @@ public class FlightTests
         var flight = new Flight(id, [e1, e2]);
         
         Assert.Equal(e1.Route, flight.Route);
-        Assert.Equal(e1.Schedule, flight.Schedule);
+        Assert.Equal(e1.Schedule, flight.OriginalSchedule);
         Assert.Equal(e2.AircraftId, flight.AircraftId);
     }
 
@@ -23,17 +23,17 @@ public class FlightTests
         var flight = new Flight(flightId, route, schedule);
 
         Assert.Equal(route, flight.Route);
-        Assert.Equal(schedule, flight.Schedule);
+        Assert.Equal(schedule, flight.OriginalSchedule);
         AssertEvents.Raised(new FlightScheduled(flight.Id, route, schedule), flight);
     }
 
     [Theory, DomainAutoData]
     public void FlightIsDelayedWhenGivenADepartureTimeLaterThanOriginal(Flight flight)
     {
-        var newDeparture = flight.Schedule!.DepartureTime.AddMinutes(40);
+        var newDeparture = flight.OriginalSchedule!.DepartureTime.AddMinutes(40);
         flight.DelayDeparture(newDeparture);
         
-        var expectedNewArrival = flight.Schedule!.ArrivalTime.AddMinutes(40);
+        var expectedNewArrival = flight.OriginalSchedule!.ArrivalTime.AddMinutes(40);
         var expectedNewSchedule = new Schedule(newDeparture, expectedNewArrival);
 
         Assert.Equal(expectedNewSchedule, flight.NewSchedule);
@@ -43,7 +43,7 @@ public class FlightTests
     [Theory, DomainAutoData]
     public void FlightDelayWithAnEarlyDepartureTimeIsInvalid(Flight flight)
     {
-        var newDeparture = flight.Schedule!.DepartureTime.AddMinutes(-10);
+        var newDeparture = flight.OriginalSchedule!.DepartureTime.AddMinutes(-10);
 
         Assert.Throws<ArgumentOutOfRangeException>(() => flight.DelayDeparture(newDeparture));
     }
@@ -51,7 +51,7 @@ public class FlightTests
     [Theory, DomainAutoData]
     public void FlightCannotDepartWithoutAnAssignedAircraft(Flight flight)
     {
-        Assert.ThrowsAny<Exception>(() => flight.Depart(flight.Schedule!.DepartureTime));
+        Assert.ThrowsAny<Exception>(() => flight.Depart(flight.OriginalSchedule!.DepartureTime));
     }
 
     [Theory, DomainAutoData]
@@ -66,37 +66,37 @@ public class FlightTests
     [Theory, DomainAutoData]
     public void FlightCanDepartWithAircraft([Assigned] Flight flight)
     {
-        flight.Depart(flight.Schedule!.DepartureTime);
+        flight.Depart(flight.OriginalSchedule!.DepartureTime);
         
-        AssertEvents.Raised(new FlightDeparted(flight.Id, flight.Schedule!.DepartureTime), flight);
+        AssertEvents.Raised(new FlightDeparted(flight.Id, flight.OriginalSchedule!.DepartureTime), flight);
     }
 
     [Theory, DomainAutoData]
     public void FlightIsDelayedIfDepartedLaterThanPlanned([Assigned] Flight flight)
     {
         var delay = TimeSpan.FromMinutes(10);
-        flight.Depart(flight.Schedule!.DepartureTime.Add(delay));
+        flight.Depart(flight.OriginalSchedule!.DepartureTime.Add(delay));
 
-        AssertEvents.Raised(new FlightDelayed(flight.Id, flight.Schedule.Add(delay)), flight);
-        AssertEvents.Raised(new FlightDeparted(flight.Id, flight.Schedule!.DepartureTime.Add(delay)), flight);
+        AssertEvents.Raised(new FlightDelayed(flight.Id, flight.OriginalSchedule.Add(delay)), flight);
+        AssertEvents.Raised(new FlightDeparted(flight.Id, flight.OriginalSchedule!.DepartureTime.Add(delay)), flight);
     }
 
     [Theory, DomainAutoData]
     public void FlightCannotArriveIfNotDeparted(Flight flight)
     {
-        Assert.ThrowsAny<Exception>(() => flight.Arrive(flight.Schedule!.ArrivalTime));
+        Assert.ThrowsAny<Exception>(() => flight.Arrive(flight.OriginalSchedule!.ArrivalTime));
     }
 
     [Theory, DomainAutoData]
     public void FlightCannotArriveEarlierThanDeparted([Departed] Flight flight)
     {
-        Assert.ThrowsAny<Exception>(() => flight.Arrive(flight.Schedule!.DepartureTime.AddMinutes(-10)));
+        Assert.ThrowsAny<Exception>(() => flight.Arrive(flight.OriginalSchedule!.DepartureTime.AddMinutes(-10)));
     }
 
     [Theory, DomainAutoData]
     public void FlightCanArriveAfterDeparture([Departed] Flight flight)
     {
-        var arrivalTime = flight.Schedule!.DepartureTime.AddHours(1);
+        var arrivalTime = flight.OriginalSchedule!.DepartureTime.AddHours(1);
         
         flight.Arrive(arrivalTime);
         

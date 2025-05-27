@@ -1,3 +1,3 @@
 namespace Framework;
 
-public record Event<TAggregate>(Id<TAggregate> AggregateId) : Event(new StreamId(AggregateId.Value));
+public record Event<TAggregate>(Id<TAggregate> AggregateId) : Event(AggregateId);

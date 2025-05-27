@@ -29,9 +29,10 @@ public partial class Flight : AggregateRoot<Flight>
         return new Flight(id, events);
     }
     
-    public Route? Route { get; private set; }
-    public Schedule? Schedule { get; private set; }
+    public Route Route { get; private set; } = null!;
+    public Schedule OriginalSchedule { get; private set; } = null!;
     public Schedule? NewSchedule { get; private set; }
+    public Schedule CurrentSchedule => NewSchedule ?? OriginalSchedule;
     public Id<Aircraft>? AircraftId { get; private set; }
     public DateTime? ActualDepartureTime { get; private set; }
     public DateTime? ActualArrivalTime { get; private set; }
@@ -43,11 +44,11 @@ public partial class Flight : AggregateRoot<Flight>
 
     public void DelayDeparture(DateTime newDeparture)
     {
-        if (newDeparture <= Schedule!.DepartureTime)
+        if (newDeparture <= OriginalSchedule.DepartureTime)
             throw new ArgumentOutOfRangeException(nameof(newDeparture), newDeparture,
                 "New departure time is not later than the scheduled departure time");
         
-        var newArrival = Schedule!.ArrivalTime.Add(newDeparture - Schedule!.DepartureTime);
+        var newArrival = OriginalSchedule.ArrivalTime.Add(newDeparture - OriginalSchedule.DepartureTime);
         
         Raise(new FlightDelayed(Id, new Schedule(newDeparture, newArrival)));
     }
@@ -59,7 +60,7 @@ public partial class Flight : AggregateRoot<Flight>
         
         if (NewSchedule != null && departureTime != NewSchedule?.DepartureTime)
             DelayDeparture(departureTime);
-        else if (departureTime != Schedule!.DepartureTime)
+        else if (departureTime != OriginalSchedule.DepartureTime)
             DelayDeparture(departureTime);
         
         Raise(new FlightDeparted(Id, departureTime));
@@ -80,7 +81,7 @@ public partial class Flight : AggregateRoot<Flight>
     private void Apply(FlightScheduled @event)
     {
         Route = @event.Route;
-        Schedule = @event.Schedule;
+        OriginalSchedule = @event.Schedule;
     }
 
     private void Apply(FlightDelayed @event)

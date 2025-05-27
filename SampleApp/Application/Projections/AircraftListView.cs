@@ -3,31 +3,25 @@ using Framework;
 
 namespace SampleApp.Application.Projections;
 
-public partial class AircraftListView : IEventHandler
+public partial class AircraftListView(IRepository<AircraftListItem> repo) : IEventHandler
 {
-    private readonly IDocumentStore _store;
-
-    public AircraftListView(IDocumentStore store)
-    {
-        _store = store;
-    }
-
     private Task HandleAsync(AircraftCreated @event, CancellationToken ct = default)
     {
-        return _store.Store<AircraftListItem, Aircraft>(new AircraftListItem()
+        return repo.Store(new AircraftListItem()
         {
-            Id = @event.AircraftId,
+            Id = AircraftListItem.DocId(@event.AircraftId),
+            AircraftId = @event.AircraftId,
             Registration = @event.Registration.ToString()
         }, ct);
     }
 
     private Task HandleAsync(AircraftAssignedToFlight @event, CancellationToken ct = default)
     {
-        return _store.Update<AircraftListItem, Aircraft>(@event.AircraftId, x => x.Flights++, ct);
+        return repo.Update(AircraftListItem.DocId(@event.AircraftId), x => x.Flights++, ct);
     }
 
     private Task HandleAsync(AircraftUnassignedFromFlight @event, CancellationToken ct = default)
     {
-        return _store.Update<AircraftListItem, Aircraft>(@event.AircraftId, x => x.Flights--, ct);
+        return repo.Update(AircraftListItem.DocId(@event.AircraftId), x => x.Flights--, ct);
     }
 }

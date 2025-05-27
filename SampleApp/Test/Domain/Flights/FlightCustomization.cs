@@ -24,6 +24,6 @@ public class DepartedAttribute() : InlineCustomizationAttribute(fixture =>
     {
         var flight = new Flight(flightId, route, schedule);
         flight.Assign(aircraftId);
-        flight.Depart(flight.Schedule!.DepartureTime);
+        flight.Depart(flight.OriginalSchedule!.DepartureTime);
         return flight;
     }));

@@ -19,6 +19,8 @@ public readonly record struct Id<T>(string Value) : IParsable<Id<T>>
         result = s != null ? new Id<T>(s) : default;
         return s != null;
     }
+    
+    public static implicit operator StreamId(Id<T> id) => new (id.Value);
 }
 
 public class IdJsonConverterFactory : JsonConverterFactory

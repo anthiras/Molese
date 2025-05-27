@@ -6,9 +6,8 @@ using InMemory;
 using Kurrent;
 using Test.Kurrent;
 using Test.TestUtils;
-using Testcontainers.EventStoreDb;
 
-namespace Test.Framework;
+namespace Test.Events;
 
 public abstract class EventStoreTests
 {

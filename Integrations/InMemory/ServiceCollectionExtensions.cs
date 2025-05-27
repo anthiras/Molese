@@ -12,8 +12,6 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddInMemoryDocumentStore(this IServiceCollection services)
     {
-        return services.AddSingleton<InMemoryDocumentStore>()
-            .AddSingleton<IDocumentStore>(provider => provider.GetRequiredService<InMemoryDocumentStore>())
-            .AddSingleton<IDocumentStore>(provider => provider.GetRequiredService<InMemoryDocumentStore>());
+        return services.AddSingleton(typeof(IDocumentStore<>), typeof(InMemoryDocumentStore<>));
     }
 }

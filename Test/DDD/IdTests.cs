@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Framework;
 
-namespace Test.Framework;
+namespace Test.DDD;
 
 public class IdTests
 {

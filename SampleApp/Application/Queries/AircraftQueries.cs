@@ -8,4 +8,4 @@ public record GetAllAircrafts();
 
 public record GetAircraftById(
     [property:Description("Aircraft ID")]
-    Id<Aircraft> Id);
+    Id<Aircraft> AircraftId);

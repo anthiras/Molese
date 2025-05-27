@@ -19,21 +19,22 @@ namespace SampleApp.Test.Application.Projections;
 
 public abstract class ProjectionTests
 {
-    private readonly IDocumentStore _documentStore;
+    private readonly IDocumentStore<AircraftListItem> _documentStore;
     private readonly EventSubscriber _subscriber;
     private readonly TrackedEventStore _trackedEventStore;
     
     protected ProjectionTests(Action<IServiceCollection> configureServices)
     {
         var services = new ServiceCollection()
-            .AddDomain()
-            .AddApplication()
-            .AddSingleton<EventSubscriber>();
+            .RegisterHandlersFromAssemblies(typeof(Aircraft).Assembly, typeof(AircraftListItem).Assembly)
+            .RegisterAggregateRootRepository<Aircraft>(Aircraft.Create)
+            .RegisterDocumentRepository<AircraftListItem>()
+            .AddEventSubscriber();
         configureServices(services);
         services.Decorate<IEventStore, TrackedEventStore>();
         
         var serviceProvider = services.BuildServiceProvider();
-        _documentStore = serviceProvider.GetRequiredService<IDocumentStore>();
+        _documentStore = serviceProvider.GetRequiredService<IDocumentStore<AircraftListItem>>();
         _subscriber = serviceProvider.GetRequiredService<EventSubscriber>();
         _trackedEventStore = (TrackedEventStore) serviceProvider.GetRequiredService<IEventStore>();
     }
@@ -43,19 +44,19 @@ public abstract class ProjectionTests
     {
         await _subscriber.Subscribe();
         
-        await _trackedEventStore.AppendToStream(new StreamId(id.Value), [new AircraftCreated(id, registration)], 0);
+        await _trackedEventStore.AppendToStream(id, [new AircraftCreated(id, registration)], 0);
 
         await _trackedEventStore.WaitForEvents(1);
         
-        var listItem = await _documentStore.Find<AircraftListItem, Aircraft>(id);
+        var listItem = await _documentStore.Find(AircraftListItem.DocId(id));
         Assert.Equal(registration.ToString(), listItem.Registration);
         Assert.Equal(0, listItem.Flights);
 
-        await _trackedEventStore.AppendToStream(new StreamId(id.Value), [new AircraftAssignedToFlight(id, flightId, timeRange)], 1);
+        await _trackedEventStore.AppendToStream(id, [new AircraftAssignedToFlight(id, flightId, timeRange)], 1);
         
         await _trackedEventStore.WaitForEvents(2);
         
-        listItem = await _documentStore.Find<AircraftListItem, Aircraft>(id);
+        listItem = await _documentStore.Find(AircraftListItem.DocId(id));
         Assert.Equal(1, listItem.Flights);
     }
 }
