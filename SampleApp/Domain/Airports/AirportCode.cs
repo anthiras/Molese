@@ -12,4 +12,6 @@ public readonly struct AirportCode
     }
     
     public string Value { get; }
+    
+    public override string ToString() => Value;
 }

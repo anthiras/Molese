@@ -15,10 +15,14 @@ public static class ServiceCollectionExtensions
         return services.Scan(scan => scan
             .FromAssemblies(assemblies)
             .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+                .AsSelfWithInterfaces()
+                .WithSingletonLifetime()
             .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
+                .AsSelfWithInterfaces()
+                .WithSingletonLifetime()
             .AddClasses(classes => classes.AssignableTo<IEventHandler>())
-            .AsImplementedInterfaces()
-            .WithSingletonLifetime());
+                .AsSelfWithInterfaces()
+                .WithSingletonLifetime());
     }
 
     public static IServiceCollection RegisterEventSourcedRepositories(this IServiceCollection services,

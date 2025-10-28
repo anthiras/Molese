@@ -7,6 +7,8 @@ namespace SampleApp.Domain.Aircrafts;
 public readonly struct AircraftRegistration(string value)
 {
     public string Value { get; } = value;
+
+    public override string ToString() => Value;
 }
 
 internal class AircraftRegistrationJsonConverter : JsonConverter<AircraftRegistration>
