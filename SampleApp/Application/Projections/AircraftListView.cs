@@ -15,6 +15,12 @@ public partial class AircraftListView(IRepository<AircraftListItem> repo) : IEve
         }, ct);
     }
 
+    private async Task HandleAsync(AircraftDeleted @event, CancellationToken ct = default)
+    {
+        var item = await repo.Find(AircraftListItem.DocId(@event.AircraftId), ct);
+        await repo.Delete(item, ct);
+    }
+
     private Task HandleAsync(AircraftAssignedToFlight @event, CancellationToken ct = default)
     {
         return repo.Update(AircraftListItem.DocId(@event.AircraftId), x => x.Flights++, ct);

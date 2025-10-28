@@ -44,6 +44,11 @@ public partial class Aircraft : AggregateRoot<Aircraft>
         
         Raise(new AircraftUnassignedFromFlight(Id, assignment.FlightId, assignment.TimeRange));
     }
+
+    public void Delete()
+    {
+        Raise(new AircraftDeleted(Id));
+    }
     
     private void Apply(AircraftCreated @event)
     {
@@ -58,5 +63,10 @@ public partial class Aircraft : AggregateRoot<Aircraft>
     private void Apply(AircraftUnassignedFromFlight @event)
     {
         _assignments.Remove(new Assignment(@event.FlightId, @event.TimeRange));
+    }
+
+    private void Apply(AircraftDeleted @event)
+    {
+        
     }
 }

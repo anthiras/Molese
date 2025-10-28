@@ -17,9 +17,9 @@ public class InMemoryRepository<TEntity> : IRepository<TEntity> where TEntity : 
         return Task.CompletedTask;
     }
 
-    public Task Delete(Id<TEntity> id, CancellationToken ct = default)
+    public Task Delete(TEntity entity, CancellationToken ct = default)
     {
-        _entities.Remove(id);
+        _entities.Remove(entity.Id);
         return Task.CompletedTask;
     }
 }

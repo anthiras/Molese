@@ -18,8 +18,9 @@ public class EventSourcedRepository<T>(IEventStore eventStore)
         entity.ClearEvents();
     }
 
-    public Task Delete(Id<T> id, CancellationToken ct = default)
+    public async Task Delete(T entity, CancellationToken ct = default)
     {
-        return eventStore.DeleteStream(id, ct);
+        await Store(entity, ct);
+        await eventStore.DeleteStream(entity.Id, ct);
     }
 }

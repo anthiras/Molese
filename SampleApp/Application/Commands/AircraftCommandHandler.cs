@@ -14,8 +14,12 @@ public class AircraftCommandHandler(IRepository<Aircraft> repository) :
         await repository.Store(aircraft);
     }
 
-    public Task Handle(DeleteAircraft command)
+    public async Task Handle(DeleteAircraft command)
     {
-        return repository.Delete(command.Id);
+        var aircraft = await repository.Find(command.Id);
+
+        aircraft.Delete();
+        
+        await repository.Store(aircraft);
     }
 }

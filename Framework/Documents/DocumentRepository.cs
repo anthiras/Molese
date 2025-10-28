@@ -12,8 +12,8 @@ public class DocumentRepository<TDocument>(IDocumentStore<TDocument> store) : IR
         return store.Store(entity, ct);
     }
 
-    public Task Delete(Id<TDocument> id, CancellationToken ct = default)
+    public Task Delete(TDocument id, CancellationToken ct = default)
     {
-        return store.Delete(id, ct);
+        return store.Delete(id.Id, ct);
     }
 }
