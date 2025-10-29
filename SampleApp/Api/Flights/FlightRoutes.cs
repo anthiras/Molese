@@ -44,7 +44,7 @@ public static class FlightRoutes
             }).WithSummary("Update flight")
             .WithTags("Flights");
 
-        app.MapPost("/flight/{flightId}/departure", async ([FromRoute] Id<Flight> flightId,
+        app.MapPost("/flights/{flightId}/departure", async ([FromRoute] Id<Flight> flightId,
                 [FromServices] ICommandHandler<Depart> depart) =>
             {
                 await depart.Handle(new Depart(flightId));
@@ -52,7 +52,7 @@ public static class FlightRoutes
             }).WithSummary("Register flight departure")
             .WithTags("Flights");
 
-        app.MapPost("/flight/{flightId}/arrival", async ([FromRoute] Id<Flight> flightId,
+        app.MapPost("/flights/{flightId}/arrival", async ([FromRoute] Id<Flight> flightId,
                 [FromServices] ICommandHandler<Arrive> depart) =>
             {
                 await depart.Handle(new Arrive(flightId));
