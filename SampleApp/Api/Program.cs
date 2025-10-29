@@ -2,6 +2,7 @@ using Framework;
 using SampleApp.Api.Aircrafts;
 using InMemory;
 using SampleApp.Api;
+using SampleApp.Api.Flights;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,7 +28,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapAircraftRoutes();
+app.MapAircraftRoutes()
+    .MapFlightRoutes();
 
 await app.Services.GetRequiredService<EventSubscriber>().Subscribe();
 app.Run();
